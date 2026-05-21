@@ -276,3 +276,282 @@ sudo apt install apache2 -y
 sudo mkdir -p /var/www/html/organic
 echo "<h1>Welcome to Organic App</h1>" | sudo tee /var/www/html/organic/index.html
 ```
+
+## Phase 7: Application Gateway
+
+### Step 12: Create Application Gateway
+
+1. Search for `Application Gateways` in the search bar.
+2. Click `+ Create`.
+
+---
+
+### Basics Tab
+
+Fill in the following details:
+
+| Field | Value |
+|---|---|
+| Resource Group | AppGateway-RG |
+| Name | MyAppGateway |
+| Region | Central India |
+| Tier | WAF V2 |
+| Enable Autoscaling | Yes or No, based on your choice |
+| Minimum Instance Count | 0 |
+| Maximum Instance Count | 2 |
+| Availability Zone | None |
+| HTTP2 | Disabled |
+| WAF Policy | Create new |
+| WAF Policy Name | MyWAFPolicy |
+
+---
+
+### Frontends Tab
+
+1. Go to the `Frontends` tab.
+2. Set the frontend IP address type:
+
+| Field | Value |
+|---|---|
+| Frontend IP Address Type | Public |
+
+3. Click `Add new` under Public IP.
+4. Enter the following name:
+
+| Field | Value |
+|---|---|
+| Public IP Name | AppGW-PublicIP |
+
+5. Click `OK`.
+
+---
+
+### Backends Tab
+
+#### Backend Pool 1 - Fitness
+
+1. Go to the `Backends` tab.
+2. Click `+ Add a backend pool`.
+3. Fill in the following details:
+
+| Field | Value |
+|---|---|
+| Name | FitnessBackendPool |
+| Add Backend Without Targets | No |
+| Target Type | Virtual Machine / IP Address |
+| Target | Private IP of VM-Fitness, for example `10.0.1.4` |
+
+4. Click `Add`.
+
+#### Backend Pool 2 - Organic
+
+1. Click `+ Add a backend pool` again.
+2. Fill in the following details:
+
+| Field | Value |
+|---|---|
+| Name | OrganicBackendPool |
+| Target Type | Virtual Machine / IP Address |
+| Target | Private IP of VM-Organic, for example `10.0.1.5` |
+
+3. Click `Add`.
+
+---
+
+## Configuration Tab - Routing Rules
+
+This is the most important tab.
+
+1. Go to the `Configuration` tab.
+2. Click `+ Add a routing rule`.
+
+---
+
+### Rule 1: Path-Based Routing Rule
+
+Fill in the following details:
+
+| Field | Value |
+|---|---|
+| Rule Name | PathBasedRule |
+| Priority | 100 |
+
+---
+
+### Listener Settings
+
+Fill in the following details:
+
+| Field | Value |
+|---|---|
+| Listener Name | HTTPListener |
+| Frontend IP | Public |
+| Protocol | HTTP |
+| Port | 80 |
+| Listener Type | Basic |
+
+---
+
+### Backend Targets Settings
+
+Fill in the following details:
+
+| Field | Value |
+|---|---|
+| Target Type | Backend Pool |
+| Backend Target | FitnessBackendPool |
+| Backend Settings | Add new |
+
+> Note: `FitnessBackendPool` is used as the default backend target. This means requests to `/` or `/fitness` will go to the Fitness application.
+
+---
+
+### Add Backend Settings
+
+Click `Add new` and fill in the following details:
+
+| Field | Value |
+|---|---|
+| Name | HTTPBackendSetting |
+| Protocol | HTTP |
+| Port | 80 |
+| Cookie-Based Affinity | Disabled |
+| Connection Draining | Enabled |
+| Connection Draining Timeout | 30 seconds |
+| Request Timeout | 20 seconds |
+
+Click `Add`.
+
+---
+
+## Path-Based Routing - Path Maps
+
+1. Click `Add multiple targets to create a path-based rule`.
+
+### Path 1 - Fitness
+
+Fill in the following details:
+
+| Field | Value |
+|---|---|
+| Path | /fitness* |
+| Target Name | FitnessPath |
+| Backend Target | FitnessBackendPool |
+| Backend Settings | HTTPBackendSetting |
+
+Click `+ Add`.
+
+### Path 2 - Organic
+
+Fill in the following details:
+
+| Field | Value |
+|---|---|
+| Path | /organic* |
+| Target Name | OrganicPath |
+| Backend Target | OrganicBackendPool |
+| Backend Settings | HTTPBackendSetting |
+
+Click `Add`.
+
+---
+
+### Create Application Gateway
+
+1. Click `Review + Create`.
+2. Click `Create`.
+
+> Note: Application Gateway usually takes around 5 to 10 minutes to deploy.
+
+---
+
+## Phase 8: WAF Configuration
+
+### Step 13: Configure WAF Policy
+
+1. Search for `Web Application Firewall Policies`.
+2. Open `MyWAFPolicy`.
+
+---
+
+### Policy Settings
+
+1. Go to `Policy Settings`.
+2. Configure the following values:
+
+| Field | Value |
+|---|---|
+| Mode | Prevention or Detection, based on what you used |
+| Inspect Request Body | Enabled |
+| Max Request Body Size | 128 KB |
+
+---
+
+### Managed Rules
+
+1. Go to `Managed Rules`.
+2. Configure the following value:
+
+| Field | Value |
+|---|---|
+| Rule Set | OWASP 3.2 or whichever version you used |
+
+3. Click `Save`.
+
+---
+
+## Phase 9: Rewrite Rules
+
+### Step 14: Configure Rewrite Rules in Application Gateway
+
+1. Open `MyAppGateway`.
+2. Go to `Rewrites` from the left panel.
+3. Click `+ Rewrite Set`.
+
+---
+
+### Rewrite Set Details
+
+Fill in the following details:
+
+| Field | Value |
+|---|---|
+| Name | MyRewriteSet |
+| Associated Routing Rules | PathBasedRule |
+
+4. Click `Next: Rewrite Rule Configuration`.
+
+---
+
+### Add Rewrite Rule
+
+1. Click `+ Add rewrite rule`.
+2. Fill in the following details:
+
+| Field | Value |
+|---|---|
+| Rule Name | RewriteRule1 |
+| Rule Sequence | 100 |
+
+---
+
+### Add Condition
+
+1. Click `+ Add condition` if you used any condition.
+2. If no condition was used, you can skip this step.
+
+---
+
+### Add Action
+
+1. Click `+ Add action`.
+2. Select the rewrite type based on what you configured:
+
+| Rewrite Type Options |
+|---|
+| Request Header |
+| Response Header |
+| URL |
+
+3. Fill in the remaining values based on your configuration.
+4. Click `Create`.
