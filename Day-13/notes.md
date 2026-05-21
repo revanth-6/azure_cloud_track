@@ -555,3 +555,39 @@ Fill in the following details:
 
 3. Fill in the remaining values based on your configuration.
 4. Click `Create`.
+
+## Phase 10: Verification
+
+### Step 15: Test the Setup
+
+1. Go to `MyAppGateway`.
+2. Open the `Overview` page.
+3. Copy the `Frontend public IP address`.
+4. Open a browser.
+5. Test the following URLs:
+
+| URL | Expected Result |
+|---|---|
+| `http://<AppGW-PublicIP>` | Fitness App opens |
+| `http://<AppGW-PublicIP>/fitness` | Fitness App opens |
+| `http://<AppGW-PublicIP>/organic` | Organic App opens |
+
+---
+
+## Architecture Summary
+
+```text
+Internet
+   |
+   | HTTP Port 80
+   ↓
+[Application Gateway - WAF V2]  ← AppGateway-Subnet 10.0.2.0/24
+   |           |
+   |           |
+   ↓           ↓
+[VM-Fitness]  [VM-Organic]      ← VM-Subnet 10.0.1.0/24
+ /fitness      /organic
+   |           |
+   ↓           ↓
+[NAT Gateway] for outbound internet
+```
