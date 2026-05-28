@@ -608,7 +608,7 @@ Need private Azure PaaS access?
 
 ---
 
+| Type | Description |
 |------|-------------|
 | **Regional VNet Peering** | Connects two VNets in the **same Azure region** |
 | **Global VNet Peering** | Connects two VNets in **different Azure regions** |
-|------|-------------|
