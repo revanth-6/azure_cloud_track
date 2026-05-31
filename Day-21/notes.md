@@ -227,10 +227,10 @@ https://{storage-account-name}.blob.core.windows.net/{container}/{blob}
 Example:
 
 https://mycompanystorage.blob.core.windows.net/images/profile-pic.jpg
-│ │ │
-│ │ └── Blob name
-│ └── Container name
-└── Storage Account name (globally unique)
+                │                                 │         │
+                │                                 │         └── Blob name
+                │                                 └── Container name
+                └── Storage Account name (globally unique)
 ```
 
 Breaking it down:
