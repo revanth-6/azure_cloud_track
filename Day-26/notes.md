@@ -1,4 +1,4 @@
-On-Premises AD vs Entra ID
+0. On-Premises AD vs Entra ID
 
 1. How Azure AD Connect authenticates On-Premises Users ?
 
