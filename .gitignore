@@ -2,5 +2,8 @@
 *.tfstate
 *.tfstate.*
 *.tfplan
-terraform.tfstate.d/
 tfplan
+terraform.tfstate.d/
+node_modules/
+.env
+.env.*
