@@ -1,0 +1,55 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: medishift-ingress
+  namespace: medishift-${environment}
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    nginx.ingress.kubernetes.io/ssl-redirect: "false" # App Gateway handles HTTPS termination and redirection; NGINX accepts plain HTTP inside VNet
+    nginx.ingress.kubernetes.io/use-regex: "true"
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /api/auth
+            pathType: Prefix
+            backend:
+              service:
+                name: medishift-auth-service
+                port:
+                  number: 3001
+          - path: /api/staff
+            pathType: Prefix
+            backend:
+              service:
+                name: medishift-staff-service
+                port:
+                  number: 3002
+          - path: /api/departments
+            pathType: Prefix
+            backend:
+              service:
+                name: medishift-staff-service
+                port:
+                  number: 3002
+          - path: /api/shifts
+            pathType: Prefix
+            backend:
+              service:
+                name: medishift-shift-service
+                port:
+                  number: 3003
+          - path: /api/leaves
+            pathType: Prefix
+            backend:
+              service:
+                name: medishift-leave-service
+                port:
+                  number: 3004
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: medishift-frontend-service
+                port:
+                  number: 3000

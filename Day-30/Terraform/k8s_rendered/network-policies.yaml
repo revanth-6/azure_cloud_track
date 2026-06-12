@@ -1,0 +1,395 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny-all
+  namespace: medishift-dev
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+    - Egress
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-nginx-to-frontend
+  namespace: medishift-dev
+spec:
+  podSelector:
+    matchLabels:
+      app: medishift-frontend
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: ingress-nginx
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-nginx-to-auth
+  namespace: medishift-dev
+spec:
+  podSelector:
+    matchLabels:
+      app: medishift-auth-service
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: ingress-nginx
+      ports:
+        - protocol: TCP
+          port: 3001
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-nginx-to-staff
+  namespace: medishift-dev
+spec:
+  podSelector:
+    matchLabels:
+      app: medishift-staff-service
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: ingress-nginx
+      ports:
+        - protocol: TCP
+          port: 3002
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-nginx-to-shift
+  namespace: medishift-dev
+spec:
+  podSelector:
+    matchLabels:
+      app: medishift-shift-service
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: ingress-nginx
+      ports:
+        - protocol: TCP
+          port: 3003
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-nginx-to-leave
+  namespace: medishift-dev
+spec:
+  podSelector:
+    matchLabels:
+      app: medishift-leave-service
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: ingress-nginx
+      ports:
+        - protocol: TCP
+          port: 3004
+---
+# Frontend NetPol
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: medishift-frontend-netpol
+  namespace: medishift-dev
+spec:
+  podSelector:
+    matchLabels:
+      app: medishift-frontend
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: ingress-nginx
+      ports:
+        - protocol: TCP
+          port: 3000
+  egress:
+    # Allow communication to APIs
+    - to:
+        - podSelector:
+            matchLabels:
+              app: medishift-auth-service
+      ports:
+        - protocol: TCP
+          port: 3001
+    - to:
+        - podSelector:
+            matchLabels:
+              app: medishift-staff-service
+      ports:
+        - protocol: TCP
+          port: 3002
+    - to:
+        - podSelector:
+            matchLabels:
+              app: medishift-shift-service
+      ports:
+        - protocol: TCP
+          port: 3003
+    - to:
+        - podSelector:
+            matchLabels:
+              app: medishift-leave-service
+      ports:
+        - protocol: TCP
+          port: 3004
+    # DNS resolution
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+---
+# Auth Service NetPol
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: medishift-auth-netpol
+  namespace: medishift-dev
+spec:
+  podSelector:
+    matchLabels:
+      app: medishift-auth-service
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app: medishift-frontend
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: ingress-nginx
+      ports:
+        - protocol: TCP
+          port: 3001
+  egress:
+    # Egress to PostgreSQL delegated subnet
+    - to:
+        - ipBlock:
+            cidr: 10.0.3.0/24
+      ports:
+        - protocol: TCP
+          port: 5432
+        - protocol: TCP
+          port: 6432
+    # DNS resolution
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+---
+# Staff Service NetPol
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: medishift-staff-netpol
+  namespace: medishift-dev
+spec:
+  podSelector:
+    matchLabels:
+      app: medishift-staff-service
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app: medishift-frontend
+        - podSelector:
+            matchLabels:
+              app: medishift-auth-service
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: ingress-nginx
+      ports:
+        - protocol: TCP
+          port: 3002
+  egress:
+    # Egress to PostgreSQL delegated subnet
+    - to:
+        - ipBlock:
+            cidr: 10.0.3.0/24
+      ports:
+        - protocol: TCP
+          port: 5432
+        - protocol: TCP
+          port: 6432
+    # DNS resolution
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+---
+# Shift Service NetPol
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: medishift-shift-netpol
+  namespace: medishift-dev
+spec:
+  podSelector:
+    matchLabels:
+      app: medishift-shift-service
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app: medishift-frontend
+        - podSelector:
+            matchLabels:
+              app: medishift-auth-service
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: ingress-nginx
+      ports:
+        - protocol: TCP
+          port: 3003
+  egress:
+    # Egress to PostgreSQL delegated subnet
+    - to:
+        - ipBlock:
+            cidr: 10.0.3.0/24
+      ports:
+        - protocol: TCP
+          port: 5432
+        - protocol: TCP
+          port: 6432
+    # Internal service calls to auth and staff
+    - to:
+        - podSelector:
+            matchLabels:
+              app: medishift-auth-service
+      ports:
+        - protocol: TCP
+          port: 3001
+    - to:
+        - podSelector:
+            matchLabels:
+              app: medishift-staff-service
+      ports:
+        - protocol: TCP
+          port: 3002
+    - to:
+        - podSelector:
+            matchLabels:
+              app: medishift-leave-service
+      ports:
+        - protocol: TCP
+          port: 3004
+    # DNS resolution
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+---
+# Leave Service NetPol
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: medishift-leave-netpol
+  namespace: medishift-dev
+spec:
+  podSelector:
+    matchLabels:
+      app: medishift-leave-service
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app: medishift-frontend
+        - podSelector:
+            matchLabels:
+              app: medishift-auth-service
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: ingress-nginx
+      ports:
+        - protocol: TCP
+          port: 3004
+  egress:
+    # Egress to PostgreSQL delegated subnet
+    - to:
+        - ipBlock:
+            cidr: 10.0.3.0/24
+      ports:
+        - protocol: TCP
+          port: 5432
+        - protocol: TCP
+          port: 6432
+    # Internal service calls to auth and shift
+    - to:
+        - podSelector:
+            matchLabels:
+              app: medishift-auth-service
+      ports:
+        - protocol: TCP
+          port: 3001
+    - to:
+        - podSelector:
+            matchLabels:
+              app: medishift-shift-service
+      ports:
+        - protocol: TCP
+          port: 3003
+    # DNS resolution
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53

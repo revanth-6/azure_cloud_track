@@ -1,0 +1,54 @@
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: medishift-auth-pdb
+  namespace: medishift-${environment}
+spec:
+  maxUnavailable: 1
+  selector:
+    matchLabels:
+      app: medishift-auth-service
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: medishift-staff-pdb
+  namespace: medishift-${environment}
+spec:
+  maxUnavailable: 1
+  selector:
+    matchLabels:
+      app: medishift-staff-service
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: medishift-shift-pdb
+  namespace: medishift-${environment}
+spec:
+  maxUnavailable: 1
+  selector:
+    matchLabels:
+      app: medishift-shift-service
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: medishift-leave-pdb
+  namespace: medishift-${environment}
+spec:
+  maxUnavailable: 1
+  selector:
+    matchLabels:
+      app: medishift-leave-service
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: medishift-frontend-pdb
+  namespace: medishift-${environment}
+spec:
+  maxUnavailable: 1
+  selector:
+    matchLabels:
+      app: medishift-frontend

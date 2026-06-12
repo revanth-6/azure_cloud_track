@@ -1,0 +1,6 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: medishift-${environment}
+  labels:
+    name: medishift-${environment}

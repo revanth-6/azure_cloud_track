@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: medishift-config
+  namespace: medishift-${environment}
+data:
+  NODE_ENV: ${node_env}
+  AUTH_SERVICE_URL: http://medishift-auth-service.medishift-${environment}.svc.cluster.local:3001
+  STAFF_SERVICE_URL: http://medishift-staff-service.medishift-${environment}.svc.cluster.local:3002
+  SHIFT_SERVICE_URL: http://medishift-shift-service.medishift-${environment}.svc.cluster.local:3003
+  LEAVE_SERVICE_URL: http://medishift-leave-service.medishift-${environment}.svc.cluster.local:3004
