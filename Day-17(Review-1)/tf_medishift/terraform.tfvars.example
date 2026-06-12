@@ -1,0 +1,45 @@
+resource_group_name = "MediShift-RG2"
+location            = "Central India"
+
+tags = {
+  Project     = "MediShift"
+  Environment = "Production"
+  Owner       = "DevOps-Team"
+  ManagedBy   = "Terraform"
+}
+
+vnet_name          = "MediShift-VNet"
+vnet_address_space = "10.0.0.0/16"
+
+appgw_subnet_name         = "AppGateway-Subnet"
+appgw_subnet_cidr         = "10.0.1.0/24"
+
+frontend_subnet_name       = "Frontend-Subnet"
+frontend_subnet_cidr       = "10.0.2.0/24"
+
+microservices_subnet_name = "Microservices-Subnet"
+microservices_subnet_cidr = "10.0.3.0/24"
+
+postgres_subnet_name      = "AzurePostgres-Subnet"
+postgres_subnet_cidr      = "10.0.4.0/24"
+
+bastion_subnet_cidr       = "10.0.5.0/24"
+
+nat_gateway_name = "MediShift-NAT-Gateway"
+
+identity_name = "medishift-managed-identity"
+
+postgres_server_name    = "medishift-db-server-prod"
+postgres_admin_username = "medishift"
+postgres_admin_password = "<your-secure-database-password>" # Set a strong password matching Azure constraints
+postgres_sku_name       = "GP_Standard_D2s_v3"
+
+microservices_vm_name = "VM-Microservices"
+frontend_vmss_name    = "VMSS-Frontend"
+vm_size               = "Standard_B2as_v2" # Using standard AMD size with capacity available
+admin_username        = "azureuser"
+admin_password        = "<your-secure-vm-admin-password>" # Set a strong password matching Azure constraints
+frontend_instances_count = 1 # Set to 1 to stay exactly within the 4-core regional subscription limit (2 cores VM + 2 cores VMSS = 4 cores)
+
+appgw_name       = "MediShift-AppGW"
+hostname         = "medishift.co.in"
