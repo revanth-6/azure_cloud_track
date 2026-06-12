@@ -145,16 +145,11 @@ This approach ensures both conceptual understanding and practical deployment ski
 * DevOps Practices
 * Real-world Project Implementations
 
+## Disclaimer
+
+This repository is maintained for educational, learning, and portfolio purposes. Architectures, deployments, and implementations are continuously improved as part of the learning process.
+
 ## Author
 
 Revanth Kondabathula
 
-* Full Stack Developer
-* Cyber Security Enthusiast
-* Penetration Tester
-* Cloud & DevOps Learner
-* IIIT Kottayam
-
-## Disclaimer
-
-This repository is maintained for educational, learning, and portfolio purposes. Architectures, deployments, and implementations are continuously improved as part of the learning process.
