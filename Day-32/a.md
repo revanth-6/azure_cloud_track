@@ -16,10 +16,10 @@ OLTP is a type of data processing that focuses on **executing real-time transact
 ### How OLTP Maintains/Processes Business Flows:
 
 ```text
-┌──────────────┐ ┌──────────────┐ ┌──────────────┐
-│ Customer     │────▶│ OLTP System  │────▶│ Database     │
-│ (Request)    │     │ (App Logic)  │     │ (ACID Txns)  │
-└──────────────┘     └──────────────┘     └──────────────┘
+┌──────────────┐      ┌──────────────┐      ┌──────────────┐
+│ Customer     │────▶│ OLTP System   │────▶│ Database     │
+│ (Request)    │      │ (App Logic)  │      │ (ACID Txns)  │
+└──────────────┘      └──────────────┘      └──────────────┘
                             │
                 ┌─────────────┼─────────────┐
                 ▼             ▼             ▼
